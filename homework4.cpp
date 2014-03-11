@@ -40,17 +40,17 @@ mpz_class modexp_crt(mpz_class base, mpz_class exp, const mpz_class& p,
 	return m_2 + h * q;
 }
 
-mpz_class modexp_mont(Montomery base, mpz_class exp, const mpz_class& p,
+// TODO
+mpz_class modexp_mont(mpz_class base, mpz_class exp, const mpz_class& p,
 		const mpz_class& q)
 {
-	// TODO
 	return modexp(base, exp, p, q);
 }
 
+// TODO
 mpz_class modexp_mont_crt(mpz_class base, mpz_class exp, const mpz_class& p,
 		const mpz_class& q)
 {
-	// TODO
 	return modexp(base, exp, p, q);
 }
 
@@ -84,5 +84,5 @@ void run_test(const mpz_class& base, const mpz_class& exp, const mpz_class& p,
 		<< "\n\tmodexp_mont:\t" << t3
 		<< "\n\tmodexp_mon_crt:\t" << t4 << '\n' << endl;
 
-	assert(t1 == t2 /*&& t1 == t3 && t1 == t4*/);
+	assert(t1 == t2 && t1 == t3 && t1 == t4);
 }
