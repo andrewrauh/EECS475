@@ -1,27 +1,25 @@
 #include "Homework4.h"
 #include <iostream>
 #include <cstdlib>
-#include <ctime> // TODO uses real time, how to measure processor time?
+#include <ctime>
 #include <array>
 #include <algorithm>
-#include <cassert>
 #include <sys/time.h>
 using std::cout; using std::endl;
 using std::array;
 using std::swap;
 using std::fixed;
 
-// TODO remove -g and add -DNDEBUG and -O3 flags
-
 
 static void run_test(const mpz_class& base, const mpz_class& exp,
 	const mpz_class& p, const mpz_class& q, int bit_length);
 
 
+// TODO am I testing correctly?
 int main(int argc, char* argv[])
 {
 	// testing parameters
-	int low_bit_len {10};
+	int low_bit_len {100};
 	int high_bit_len {1000};
 	int tests_per_len {3};
 	if(argc == 4) {
@@ -34,7 +32,7 @@ int main(int argc, char* argv[])
 
     gmp_randstate_t state;
     gmp_randinit_default(state);
-    gmp_randseed_ui(state, time(nullptr)); // TODO move into for loop?
+    gmp_randseed_ui(state, time(nullptr));
 
 	for(int num_bits = low_bit_len; num_bits <= high_bit_len; ++num_bits) {
 		for(int j = 0; j < tests_per_len; ++j) {
@@ -48,13 +46,12 @@ int main(int argc, char* argv[])
 
 			// get p
 			mpz_class p {};
-			mpz_urandomb(p.get_mpz_t(), state, num_bits);
+			mpz_urandomb(p.get_mpz_t(), state, num_bits / 2);
 			mpz_nextprime(p.get_mpz_t(), p.get_mpz_t());
-
 
 			// get q
 			mpz_class q {};
-			mpz_urandomb(q.get_mpz_t(), state, num_bits);
+			mpz_urandomb(q.get_mpz_t(), state, num_bits / 2);
 			mpz_nextprime(q.get_mpz_t(), q.get_mpz_t());
 
 			if(p == q) { // if we chose the same numbers, rerun test
@@ -68,6 +65,7 @@ int main(int argc, char* argv[])
 		}
 	}
 
+	// manual tests for correctness
 	// run_test(2, 10, 3, 2, 10); // TODO this breaks crt. Why?
 	// run_test(13, 1023, 883, 881, 10);
 	// run_test(13, 1024, 883, 881, 10);
@@ -90,7 +88,7 @@ static void run_test(const mpz_class& base, const mpz_class& exp,
 		timeval tim {};
 		gettimeofday(&tim, nullptr);
 		double init_time {tim.tv_sec + (tim.tv_usec / 1000000.0)};
-		mpz_class result {func(base, exp, p, q)}; // TODO will the compiler optimize this out?
+		mpz_class result {func(base, exp, p, q)}; // TODO will the compiler optimize this out?. 99% sure no
 		gettimeofday(&tim, nullptr);
 		double finish_time {tim.tv_sec + (tim.tv_usec / 1000000.0)};
 		cout << '\t' << fixed << finish_time - init_time;
