@@ -1,15 +1,15 @@
 #ifndef MONTGOMERY
 #define MONTGOMERY
 
-#include <gmpxx.h>
+#include "uberzahl/uberzahl.h"
 
 
 class Montgomery {
 public:
 	Montgomery();
 
-	// construct a Montgomery number from mpz_class number
-	Montgomery(const mpz_class& num);
+	// construct a Montgomery number from uberzahl number
+	Montgomery(const uberzahl& num);
 
 	// operators
 	Montgomery operator+(const Montgomery& other) const;
@@ -30,15 +30,15 @@ public:
 	bool operator>(double other) const;
 	bool operator<(double other) const;
 
-	// returns the number translated from Montgomery to mpz_class
-	mpz_class get_num() const;
+	// returns the number translated from Montgomery to uberzahl
+	// uberzahl get_num() const;
 
 	// returns num.get_mpz_t(). const/non-const versions both necessary
-	mpz_srcptr get_mpz_t() const;
-	mpz_ptr get_mpz_t();
+	// mpz_srcptr get_mpz_t() const;
+	// mpz_ptr get_mpz_t();
 
 private:
-	mpz_class num;
+	uberzahl num;
 
 };
 
