@@ -32,44 +32,39 @@ int main(int argc, char* argv[])
 
     srand(time(nullptr));
 
-    cerr << "starting tests\n";
-	// for(int num_bits = low_bit_len; num_bits <= high_bit_len; ++num_bits) {
-	// 	for(int j = 0; j < tests_per_len; ++j) {
-	// 		uberzahl base {};
-	// 		base.random(num_bits);
-	// 		cerr << "chose base\n";
+	for(int num_bits = low_bit_len; num_bits <= high_bit_len; ++num_bits) {
+		for(int j = 0; j < tests_per_len; ++j) {
+			uberzahl base {};
+			base.random(num_bits);
 
-	// 		uberzahl exp {};
-	// 		exp.random(num_bits);
-	// 		cerr << "chose exp\n";
+			uberzahl exp {};
+			exp.random(num_bits);
 
-	// 		uberzahl p {};
-	// 		p.random(num_bits / 2);
-	// 		p = nextprime(p, 50);
-	// 		cerr << "chose p\n";
+			uberzahl p {};
+			p.random(num_bits / 2);
+			p = nextprime(p, 50);
 
-	// 		// get q
-	// 		uberzahl q {};
-	// 		q.random(num_bits / 2);
-	// 		q = nextprime(q, 50);
-	// 		cerr << "chose q\n";
+			// get q
+			uberzahl q {};
+			q.random(num_bits / 2);
+			q = nextprime(q, 50);
 
-	// 		if(p == q) { // if we chose the same numbers, rerun test
-	// 			--j;
-	// 			continue;
-	// 		} else if(p < q) {
-	// 			swap(p, q);
-	// 		}
+			if(p == q) { // if we chose the same numbers, rerun test
+				--j;
+				continue;
+			} else if(p < q) {
+				swap(p, q);
+			}
 
-	// 		run_test(base, exp, p, q, num_bits);
-	// 	}
-	// }
+			run_test(base, exp, p, q, num_bits);
+		}
+	}
 
 	// manual tests for correctness
 	// run_test(2, 10, 3, 2, 10); // TODO this breaks crt. Why?
-	run_test(13, 1023, 883, 881, 10);
-	run_test(13, 1024, 883, 881, 10);
-	run_test(13, 1025, 883, 881, 10);
+	// run_test(13, 1023, 883, 881, 10);
+	// run_test(13, 1024, 883, 881, 10);
+	// run_test(13, 1025, 883, 881, 10);
 
 	return 0;
 }
@@ -80,7 +75,6 @@ int main(int argc, char* argv[])
 static void run_test(const uberzahl& base, const uberzahl& exp,
 	const uberzahl& p, const uberzahl& q, int bit_length)
 {
-	cerr << "entered run_test\n";
 	cout << bit_length;
 
 	using modexp_t = uberzahl (*)(uberzahl, uberzahl, const uberzahl&, const uberzahl&);
@@ -96,7 +90,6 @@ static void run_test(const uberzahl& base, const uberzahl& exp,
 	}
 
 	cout << '\n';
-	cerr << "completed computation\n";
 
 	#ifdef DEBUG
 	uberzahl t1 {modexp(base, exp, p, q)};

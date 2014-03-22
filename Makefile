@@ -1,8 +1,8 @@
 CC = g++
 LD = g++
 
-CFLAGS = -c -pedantic -std=c++11 -Wall
-LFLAGS = -pedantic -Wall -O3 
+CFLAGS = -c -pedantic -std=c++11 -Wall -O3
+LFLAGS = -pedantic -Wall
 
 OBJS = Montgomery.o Homework4.o uberzahl.o main.o
 PROG = Homework4
