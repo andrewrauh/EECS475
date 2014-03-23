@@ -18,6 +18,16 @@ static void run_test(const uberzahl& base, const uberzahl& exp,
 // TODO am I testing correctly?
 int main(int argc, char* argv[])
 {
+	uberzahl a=23;
+	uberzahl b=11;
+	uberzahl p=7;
+	uberzahl q=5;
+	uberzahl test1=modexp_mont(a,b,p,q);
+	uberzahl test2=modexp(a,b,p,q);
+	uberzahl test3=modexp_mont_crt(a,b,p,q);
+	uberzahl test4=modexp_crt(a,b,p,q);
+	cout << test1 << " " << test2 << " " << test3 << " " << test4 << endl;
+
 	// testing parameters
 	int low_bit_len {100};
 	int high_bit_len {1000};
@@ -32,7 +42,7 @@ int main(int argc, char* argv[])
 
     srand(time(nullptr));
 
-	for(int num_bits = low_bit_len; num_bits <= high_bit_len; ++num_bits) {
+	for(int num_bits = low_bit_len; num_bits <= high_bit_len; num_bits+=100) {
 		for(int j = 0; j < tests_per_len; ++j) {
 			uberzahl base {};
 			base.random(num_bits);
@@ -77,7 +87,7 @@ static void run_test(const uberzahl& base, const uberzahl& exp,
 {
 	cout << bit_length;
 
-	using modexp_t = uberzahl (*)(uberzahl, uberzahl, const uberzahl&, const uberzahl&);
+	using modexp_t = uberzahl (*)(uberzahl, uberzahl, const uberzahl&, const uberzahl&);	
 	array<modexp_t, 4> funcs {modexp, modexp_crt, modexp_mont, modexp_mont_crt};
 	for(modexp_t func : funcs) {
 		timeval tim {};
