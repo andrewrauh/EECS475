@@ -67,12 +67,11 @@ uberzahl modexp_mont(uberzahl base, uberzahl exp, const uberzahl& p,
 		R=R*2;
 	}
 	uberzahl Mprime=(R*R.inverse(mod)-1)/mod;
-	uberzahl baseHat=(base*R)%mod;
+	uberzahl baseHat=(base*(R-mod))%mod;
 	uberzahl total {1};
-	base = base % mod;
 	static const uberzahl zero {"0"}; // don't reinitialize over and over
 	while(exp > zero) {
-		if(exp % 2 == 1){
+		if((exp & 1) == 1){
 			total=mont_reduction(baseHat*total,R,mod,Mprime);
 		}
 		exp = exp >> 1;
@@ -84,7 +83,7 @@ uberzahl modexp_mont(uberzahl base, uberzahl exp, const uberzahl& p,
 uberzahl modexp_mont_crt(uberzahl base, uberzahl exp, const uberzahl& p,
 	const uberzahl& q)
 {	
-	/*
+	
 	assert(p > q);
 	uberzahl exp_p = exp % (p - 1);
 	uberzahl exp_q = exp % (q - 1);
@@ -98,7 +97,7 @@ uberzahl modexp_mont_crt(uberzahl base, uberzahl exp, const uberzahl& p,
 		h = (q_inv * (m_1 - m_2)) % p;
 	}
 	return m_2 + h * q;
-	*/
-	uberzahl a=1;
-	return a;
+	
+	//uberzahl a=1;
+	//return a;
 }
