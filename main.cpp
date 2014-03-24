@@ -22,10 +22,10 @@ int main(int argc, char* argv[])
 	uberzahl b=11;
 	uberzahl p=7;
 	uberzahl q=5;
-	uberzahl test1=modexp_mont(a,b,p,q);
-	uberzahl test2=modexp(a,b,p,q);
-	uberzahl test3=modexp_mont_crt(a,b,p,q);
-	uberzahl test4=modexp_crt(a,b,p,q);
+	uberzahl test1=modexp(a,b,p,q);
+	uberzahl test2=modexp_crt(a,b,p,q);
+	uberzahl test3=modexp_mont(a,b,p,q);
+	uberzahl test4=modexp_mont_crt(a,b,p,q);
 	cout << test1 << " " << test2 << " " << test3 << " " << test4 << endl;
 
 	// testing parameters

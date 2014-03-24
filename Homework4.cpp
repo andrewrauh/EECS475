@@ -4,23 +4,12 @@
 #include <iostream>
 using std::cerr; using std::endl;
 
+uberzahl mont_reduction(const uberzahl& num, const uberzahl& R, const uberzahl& mod, const uberzahl& Mprime);
 
-template<typename T>
-static T generic_modexp(T base, T exp, const T& p, const T& q);
-template<typename T>
-static T generic_modexp_crt(T base, T exp, const T& p, const T& q);
-template<typename T>
-static T generic_mont_reduction(T num, T R, T mod, T Mprime);
-template<typename T>
-static T generic_modexp_mont(T base, T exp, const T& p, const T& q);
-template<typename T>
-static T generic_modexp_mont_crt(T base, T exp, const T& p, const T& q);
-
-template<typename T>
-static T generic_mont_reduction(T num, T R, T mod, T Mprime){
-	static const T zero {"0"};
-	T m=(num*Mprime)&(R-1);
-	T t=(num+m*mod)/R;
+uberzahl mont_reduction(const uberzahl& num, const uberzahl& R, const uberzahl& mod, const uberzahl& Mprime){
+	static const uberzahl zero {"0"};
+	uberzahl m=(num*Mprime)&(R-1);
+	uberzahl t=(num+m*mod)/R;
 	if(t>=mod){
 		return t-mod;
 	} else if(t>=zero){
@@ -33,40 +22,11 @@ static T generic_mont_reduction(T num, T R, T mod, T Mprime){
 
 uberzahl modexp(uberzahl base, uberzahl exp, const uberzahl& p, const uberzahl& q)
 {
-	return generic_modexp(base, exp, p, q);
-}
-
-uberzahl modexp_crt(uberzahl base, uberzahl exp, const uberzahl& p,
-	const uberzahl& q)
-{
-	return generic_modexp_crt(base, exp, p, q);
-}
-
-uberzahl modexp_mont(uberzahl base, uberzahl exp, const uberzahl& p,
-	const uberzahl& q)
-{
-	return generic_modexp_mont(base, exp, p, q);
-}
-
-uberzahl modexp_mont_crt(uberzahl base, uberzahl exp, const uberzahl& p,
-	const uberzahl& q)
-{
-	uberzahl a=1;
-	return a;
-	//return generic_modexp_mont_crt(base, exp, p, q);
-}
-
-
-// ************** helpers ************************************
-
-template<typename T>
-static T generic_modexp(T base, T exp, const T& p, const T& q)
-{
 	assert(p > q);
-	T mod {p * q};
-	T total {1};
+	uberzahl mod {p * q};
+	uberzahl total {1};
 	base = base % mod;
-	static const T zero {"0"}; // don't reinitialize over and over
+	static const uberzahl zero {"0"}; // don't reinitialize over and over
 	while(exp > zero) {
 		if(exp % 2 == 1)
 			total = (total * base) % mod;
@@ -76,70 +36,69 @@ static T generic_modexp(T base, T exp, const T& p, const T& q)
 	return total;
 }
 
-// TODO this fails for small values. Why?
-template<typename T>
-static T generic_modexp_crt(T base, T exp, const T& p, const T& q)
+uberzahl modexp_crt(uberzahl base, uberzahl exp, const uberzahl& p,
+	const uberzahl& q)
 {
 	assert(p > q);
-	T exp_p = exp % (p - 1);
-	T exp_q = exp % (q - 1);
-	T q_inv {q.inverse(p)};
-	T m_1 = generic_modexp(base, exp_p, p, T {1});
-	T m_2 = generic_modexp(base, exp_q, q, T {1});
-	T h {"0"};
+	uberzahl exp_p = exp % (p - 1);
+	uberzahl exp_q = exp % (q - 1);
+	uberzahl q_inv {q.inverse(p)};
+	uberzahl m_1 = modexp(base, exp_p, p, uberzahl {1});
+	uberzahl m_2 = modexp(base, exp_q, q, uberzahl {1});
+	uberzahl h {"0"};
 	if(m_1 < m_2) {
 		h = (q_inv * (m_1 + p - m_2)) % p;
 	} else {
 		h = (q_inv * (m_1 - m_2)) % p;
 	}
-	static const T zero {"0"}; // don't reinitialize over and over
+	static const uberzahl zero {"0"}; // don't reinitialize over and over
 	// if(h < zero)
 		// h = h + p;
 	return m_2 + h * q;
 }
 
-
-template<typename T>
-static T generic_modexp_mont(T base, T exp, const T& p, const T& q)
+uberzahl modexp_mont(uberzahl base, uberzahl exp, const uberzahl& p,
+	const uberzahl& q)
 {
 	assert(p > q);
-	T mod {p * q};
-	T R {1};
+	uberzahl mod {p * q};
+	uberzahl R {1};
 	while(R<=mod){
 		R=R*2;
 	}
-	T Mprime=(R*R.inverse(mod)-1)/mod;
-	T Rhat=((R-mod)*(R-mod))%mod;
-	T baseHat=generic_mont_reduction(base*Rhat,R,mod,Mprime);
-	T total {1};
+	uberzahl Mprime=(R*R.inverse(mod)-1)/mod;
+	uberzahl baseHat=(base*R)%mod;
+	uberzahl total {1};
 	base = base % mod;
-	static const T zero {"0"}; // don't reinitialize over and over
+	static const uberzahl zero {"0"}; // don't reinitialize over and over
 	while(exp > zero) {
 		if(exp % 2 == 1){
-			total=generic_mont_reduction(baseHat*total,R,mod,Mprime);
+			total=mont_reduction(baseHat*total,R,mod,Mprime);
 		}
 		exp = exp >> 1;
-		base=generic_mont_reduction(base*baseHat,R,mod,Mprime);
-		baseHat=generic_mont_reduction(base*Rhat,R,mod,Mprime);
+		baseHat=mont_reduction(baseHat*baseHat,R,mod,Mprime);
 	}
 	return total;
 }
 
-
-template<typename T>
-static T generic_modexp_mont_crt(T base, T exp, const T& p, const T& q)
-{
+uberzahl modexp_mont_crt(uberzahl base, uberzahl exp, const uberzahl& p,
+	const uberzahl& q)
+{	
+	/*
 	assert(p > q);
-	T exp_p = exp % (p - 1);
-	T exp_q = exp % (q - 1);
-	T q_inv {q.inverse(p)};
-	T m_1 = generic_modexp_mont(base, exp_p, p, T {1});
-	T m_2 = generic_modexp_mont(base, exp_q, q, T {1});
-	T h {"0"};
+	uberzahl exp_p = exp % (p - 1);
+	uberzahl exp_q = exp % (q - 1);
+	uberzahl q_inv {q.inverse(p)};
+	uberzahl m_1 = modexp_mont(base, exp_p, p, uberzahl {1});
+	uberzahl m_2 = modexp_mont(base, exp_q, q, uberzahl {1});
+	uberzahl h {"0"};
 	if(m_1 < m_2) {
 		h = (q_inv * (m_1 + p - m_2)) % p;
 	} else {
 		h = (q_inv * (m_1 - m_2)) % p;
 	}
 	return m_2 + h * q;
+	*/
+	uberzahl a=1;
+	return a;
 }
