@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
 
     srand(time(nullptr));
 
-	for(int num_bits = low_bit_len; num_bits <= high_bit_len; num_bits+=100) {
+	for(int num_bits = 32; num_bits <= 2048; num_bits = num_bits << 1) {
 		for(int j = 0; j < tests_per_len; ++j) {
 			uberzahl base {};
 			base.random(num_bits);

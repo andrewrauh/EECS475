@@ -4,12 +4,13 @@
 #include <iostream>
 using std::cerr; using std::endl;
 
-uberzahl mont_reduction(const uberzahl& num, const uberzahl& R, const uberzahl& mod, const uberzahl& Mprime);
 
-uberzahl mont_reduction(const uberzahl& num, const uberzahl& R, const uberzahl& mod, const uberzahl& Mprime){
+static uberzahl mont_reduction(const uberzahl& num, const uberzahl& R, smallType R_bitlength
+	,const uberzahl& mod, const uberzahl& Mprime)
+{
 	static const uberzahl zero {"0"};
 	uberzahl m=(num*Mprime)&(R-1);
-	uberzahl t=(num+m*mod)/R;
+	uberzahl t=(num+m*mod) >> R_bitlength;
 	if(t>=mod){
 		return t-mod;
 	} else if(t>=zero){
@@ -51,9 +52,6 @@ uberzahl modexp_crt(uberzahl base, uberzahl exp, const uberzahl& p,
 	} else {
 		h = (q_inv * (m_1 - m_2)) % p;
 	}
-	static const uberzahl zero {"0"}; // don't reinitialize over and over
-	// if(h < zero)
-		// h = h + p;
 	return m_2 + h * q;
 }
 
@@ -63,8 +61,10 @@ uberzahl modexp_mont(uberzahl base, uberzahl exp, const uberzahl& p,
 	assert(p > q);
 	uberzahl mod {p * q};
 	uberzahl R {1};
+	int R_bitlength = 0;
 	while(R<=mod){
 		R=R*2;
+		++R_bitlength;
 	}
 	uberzahl Mprime=(R*R.inverse(mod)-1)/mod;
 	uberzahl baseHat=(base*(R-mod))%mod;
@@ -72,10 +72,10 @@ uberzahl modexp_mont(uberzahl base, uberzahl exp, const uberzahl& p,
 	static const uberzahl zero {"0"}; // don't reinitialize over and over
 	while(exp > zero) {
 		if((exp & 1) == 1){
-			total=mont_reduction(baseHat*total,R,mod,Mprime);
+			total=mont_reduction(baseHat*total,R,R_bitlength,mod,Mprime);
 		}
 		exp = exp >> 1;
-		baseHat=mont_reduction(baseHat*baseHat,R,mod,Mprime);
+		baseHat=mont_reduction(baseHat*baseHat,R,R_bitlength,mod,Mprime);
 	}
 	return total;
 }
@@ -97,7 +97,4 @@ uberzahl modexp_mont_crt(uberzahl base, uberzahl exp, const uberzahl& p,
 		h = (q_inv * (m_1 - m_2)) % p;
 	}
 	return m_2 + h * q;
-	
-	//uberzahl a=1;
-	//return a;
 }
